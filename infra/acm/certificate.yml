@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  ACM TLS certificate for bonefishsoftware.com.
+  IMPORTANT: This stack MUST be deployed to us-east-1 — CloudFront only
+  accepts ACM certificates from that region.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: bonefishsoftware.com
+    Description: The primary domain name for the certificate.
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub 'www.${DomainName}'
+      ValidationMethod: DNS
+      Tags:
+        - Key: Project
+          Value: bonefishsoftware-com
+
+Outputs:
+  CertificateArn:
+    Description: ARN of the validated ACM certificate (pass to the website stack)
+    Value: !Ref Certificate
+    Export:
+      Name: BonefishCertificateArn

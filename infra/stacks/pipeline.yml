@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CodePipeline + CodeBuild CI/CD for bonefishsoftware.com.
+  Triggers on GitHub push → builds React app → syncs to S3 → invalidates CloudFront.
+  Deploy to us-west-2.
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Description: GitHub username or org that owns the repo.
+
+  GitHubRepo:
+    Type: String
+    Default: bonefishsoftware-website
+    Description: GitHub repository name (no owner prefix).
+
+  GitHubBranch:
+    Type: String
+    Default: main
+    Description: Branch to deploy from.
+
+  S3BucketName:
+    Type: String
+    Description: Name of the website S3 bucket (output from website stack).
+
+  DistributionId:
+    Type: String
+    Description: CloudFront distribution ID (output from website stack).
+
+Resources:
+
+  # --- CodeStar Connection (GitHub App — must be authorized in console after deploy) ---
+  GitHubConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: bonefish-github
+      ProviderType: GitHub
+
+  # --- Artifact bucket (pipeline intermediate artifacts) ---
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'bonefish-pipeline-artifacts-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # --- IAM role for CodeBuild ---
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bonefish-codebuild-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: Logs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Sid: ArtifactBucket
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+                Resource: !Sub '${ArtifactBucket.Arn}/*'
+              - Sid: WebsiteSync
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3BucketName}'
+                  - !Sub 'arn:aws:s3:::${S3BucketName}/*'
+              - Sid: CloudFrontInvalidation
+                Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistributionId}'
+
+  # --- CodeBuild project ---
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: bonefish-build
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Ref S3BucketName
+          - Name: DISTRIBUTION_ID
+            Value: !Ref DistributionId
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+
+  # --- IAM role for CodePipeline ---
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bonefish-pipeline-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: PipelinePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ArtifactBucket
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                Resource:
+                  - !Sub '${ArtifactBucket.Arn}'
+                  - !Sub '${ArtifactBucket.Arn}/*'
+              - Sid: CodeBuild
+                Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource: !GetAtt BuildProject.Arn
+              - Sid: CodeStarConnection
+                Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Ref GitHubConnection
+
+  # --- CodePipeline ---
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: bonefish-website-pipeline
+      RoleArn: !GetAtt PipelineRole.Arn
+      PipelineType: V2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GitHubConnection
+                FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepo}'
+                BranchName: !Ref GitHubBranch
+                DetectChanges: true
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Build
+          Actions:
+            - Name: BuildAndDeploy
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref BuildProject
+              InputArtifacts:
+                - Name: SourceArtifact
+
+Outputs:
+  PipelineName:
+    Value: !Ref Pipeline
+    Description: CodePipeline name
+
+  GitHubConnectionArn:
+    Value: !Ref GitHubConnection
+    Description: >
+      CodeStar Connection ARN. After deploy, go to AWS Console → CodePipeline →
+      Settings → Connections → bonefish-github → Update pending connection
+      to authorize GitHub access.

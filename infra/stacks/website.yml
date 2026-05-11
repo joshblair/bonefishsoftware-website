@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  S3 origin bucket + CloudFront distribution for bonefishsoftware.com.
+  Deploy to us-west-2. Requires the ACM certificate ARN from the certificate
+  stack (deployed separately to us-east-1).
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: bonefishsoftware.com
+
+  CertificateArn:
+    Type: String
+    Description: >
+      ARN of the ACM certificate from us-east-1.
+      Run: aws cloudformation describe-stacks --stack-name bonefish-acm
+           --region us-east-1 --query "Stacks[0].Outputs[?OutputKey=='CertificateArn'].OutputValue" --output text
+
+Resources:
+
+  # --- S3 Bucket (private — served only through CloudFront OAC) ---
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${DomainName}-website'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Project
+          Value: bonefishsoftware-com
+
+  # --- CloudFront Origin Access Control ---
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${DomainName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # --- S3 Bucket Policy: allow CloudFront OAC only ---
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${WebsiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub >-
+                  arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+
+  # --- CloudFront Distribution ---
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${DomainName} static site'
+        DefaultRootObject: index.html
+        Aliases:
+          - !Ref DomainName
+          - !Sub 'www.${DomainName}'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        HttpVersion: http2and3
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
+          Compress: true
+          AllowedMethods: [GET, HEAD, OPTIONS]
+        # SPA routing: map S3 403/404 → index.html with 200 so react-router handles it
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+        PriceClass: PriceClass_100
+      Tags:
+        - Key: Project
+          Value: bonefishsoftware-com
+
+Outputs:
+  BucketName:
+    Description: S3 bucket that holds the static site
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: BonefishWebsiteBucket
+
+  DistributionId:
+    Description: CloudFront distribution ID (used by CodeBuild for invalidations)
+    Value: !Ref Distribution
+    Export:
+      Name: BonefishDistributionId
+
+  DistributionDomain:
+    Description: CloudFront domain — point your DNS CNAME here
+    Value: !GetAtt Distribution.DomainName
