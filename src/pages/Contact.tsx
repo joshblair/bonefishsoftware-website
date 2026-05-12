@@ -55,8 +55,8 @@ export default function Contact() {
           {/* Info column */}
           <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-[#F0F4F8] mb-2">What to expect</h3>
-              <ul className="space-y-3 text-[#8B95A3] text-sm">
+              <h3 className="text-lg font-semibold text-[#00D4FF] mb-2">What to expect</h3>
+              <ul className="space-y-3 text-[#B8C5D0] text-sm">
                 {[
                   'A quick discovery call to understand your needs',
                   'A clear proposal with timeline and cost estimate',
@@ -71,7 +71,7 @@ export default function Contact() {
               </ul>
             </div>
 
-            <div className="rounded-xl border border-[#2A3040] bg-[#1C2028] p-6 text-sm text-[#8B95A3]">
+            <div className="rounded-xl border border-[#2A3040] bg-[#1C2028] p-6 text-sm text-[#B8C5D0]">
               <p className="font-medium text-[#F0F4F8] mb-1">Prefer email?</p>
               <p>
                 Reach out directly at{' '}
@@ -100,7 +100,7 @@ export default function Contact() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Jane Smith"
-                  className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#8B95A3] focus:border-[#00D4FF] focus:outline-none transition-colors"
+                  className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#B8C5D0] focus:border-[#00D4FF] focus:outline-none transition-colors"
                 />
               </div>
               <div>
@@ -115,14 +115,14 @@ export default function Contact() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="jane@example.com"
-                  className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#8B95A3] focus:border-[#00D4FF] focus:outline-none transition-colors"
+                  className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#B8C5D0] focus:border-[#00D4FF] focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#F0F4F8] mb-1.5" htmlFor="company">
-                Company <span className="text-[#8B95A3] font-normal">(optional)</span>
+                Company <span className="text-[#B8C5D0] font-normal">(optional)</span>
               </label>
               <input
                 id="company"
@@ -131,7 +131,7 @@ export default function Contact() {
                 value={form.company}
                 onChange={handleChange}
                 placeholder="Acme Corp"
-                className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#8B95A3] focus:border-[#00D4FF] focus:outline-none transition-colors"
+                className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#B8C5D0] focus:border-[#00D4FF] focus:outline-none transition-colors"
               />
             </div>
 
@@ -147,7 +147,7 @@ export default function Contact() {
                 value={form.message}
                 onChange={handleChange}
                 placeholder="Tell us about your project, goals, and timeline..."
-                className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#8B95A3] focus:border-[#00D4FF] focus:outline-none transition-colors resize-none"
+                className="w-full rounded-md border border-[#2A3040] bg-[#1C2028] px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#B8C5D0] focus:border-[#00D4FF] focus:outline-none transition-colors resize-none"
               />
             </div>
 

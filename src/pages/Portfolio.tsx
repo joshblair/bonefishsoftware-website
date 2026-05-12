@@ -36,13 +36,13 @@ export default function Portfolio() {
               <span className="text-xs uppercase tracking-widest text-[#00D4FF] font-medium">
                 {item.category}
               </span>
-              <h3 className="text-lg font-semibold text-[#8B95A3]">{item.title}</h3>
-              <p className="text-sm text-[#8B95A3] leading-relaxed">{item.description}</p>
+              <h3 className="text-lg font-semibold text-[#F0F4F8]">{item.title}</h3>
+              <p className="text-sm text-[#B8C5D0] leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>
 
-        <p className="mt-12 text-center text-sm text-[#8B95A3]">
+        <p className="mt-12 text-center text-sm text-[#B8C5D0]">
           Portfolio projects are added as they become available.{' '}
           <span className="text-[#F0F4F8]">Check back soon.</span>
         </p>

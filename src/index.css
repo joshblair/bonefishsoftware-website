@@ -8,7 +8,7 @@
   --color-accent: #00D4FF;
   --color-accent-dim: #00a8cc;
   --color-text: #F0F4F8;
-  --color-text-muted: #8B95A3;
+  --color-text-muted: #B8C5D0;
   --color-border: #2A3040;
 
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 18px;
 }
 
 body {

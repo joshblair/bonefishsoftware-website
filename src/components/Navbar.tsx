@@ -15,16 +15,16 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm font-medium transition-colors ${
-      isActive ? 'text-[#00D4FF]' : 'text-[#8B95A3] hover:text-[#F0F4F8]'
+      isActive ? 'text-[#00D4FF]' : 'text-[#B8C5D0] hover:text-[#F0F4F8]'
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#2A3040] bg-[#111318]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[#2A3040] bg-[#1C2028]/95 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <NavLink to="/" className="flex items-center">
-            <img src="/logo.svg" alt="Bonefish Software" className="h-10 w-auto" />
+            <img src="/logo.svg" alt="Bonefish Software" className="h-10 w-auto drop-shadow-[0_0_8px_rgba(0,212,255,0.25)]" />
           </NavLink>
 
           {/* Desktop nav */}
@@ -48,7 +48,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-[#8B95A3] hover:text-[#F0F4F8] p-2"
+            className="md:hidden text-[#B8C5D0] hover:text-[#F0F4F8] p-2"
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >

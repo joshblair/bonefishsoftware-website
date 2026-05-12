@@ -21,16 +21,16 @@ export default function Services() {
               <h3 className="text-lg font-semibold text-[#F0F4F8] mb-3 group-hover:text-[#00D4FF] transition-colors">
                 {svc.title}
               </h3>
-              <p className="text-[#8B95A3] text-sm leading-relaxed flex-1">{svc.description}</p>
+              <p className="text-[#B8C5D0] text-sm leading-relaxed flex-1">{svc.description}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-16 rounded-2xl border border-[#00D4FF]/20 bg-[#1C2028] p-8 text-center">
-          <h3 className="text-xl font-semibold text-[#F0F4F8] mb-3">
+          <h3 className="text-xl font-semibold text-[#00D4FF] mb-3">
             Need something not listed here?
           </h3>
-          <p className="text-[#8B95A3] mb-6 max-w-lg mx-auto">
+          <p className="text-[#B8C5D0] mb-6 max-w-lg mx-auto">
             Every project is different. Reach out and let's figure out together how we can help.
           </p>
           <Link
