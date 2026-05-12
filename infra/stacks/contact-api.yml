@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Contact form API — API Gateway HTTP API + Python Lambda + DynamoDB + SES.
+  Contact form API — HTTP API + Python Lambda + DynamoDB + SES.
   Deploy to us-west-2.
 
 Parameters:
@@ -37,7 +37,6 @@ Resources:
     Properties:
       TableName: bonefish-contact-submissions
       BillingMode: PAY_PER_REQUEST
-      TableClass: STANDARD
       AttributeDefinitions:
         - AttributeName: submissionId
           AttributeType: S
@@ -51,6 +50,22 @@ Resources:
       Tags:
         - Key: Project
           Value: bonefishsoftware-com
+
+  # --- HTTP API (SAM manages routes, integrations, and stage automatically) ---
+  ContactApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+          - http://localhost:5173
+        AllowHeaders:
+          - Content-Type
+        AllowMethods:
+          - POST
+          - OPTIONS
+        MaxAge: 300
 
   # --- Lambda execution role ---
   LambdaRole:
@@ -103,40 +118,6 @@ Resources:
             ApiId: !Ref ContactApi
             Path: /contact
             Method: OPTIONS
-
-  # --- HTTP API ---
-  ContactApi:
-    Type: AWS::ApiGatewayV2::Api
-    Properties:
-      Name: bonefish-contact-api
-      ProtocolType: HTTP
-      CorsConfiguration:
-        AllowOrigins:
-          - !Ref AllowedOrigin
-          - http://localhost:5173
-        AllowHeaders:
-          - Content-Type
-        AllowMethods:
-          - POST
-          - OPTIONS
-        MaxAge: 300
-
-  # --- Auto-deploy stage ---
-  ApiStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      ApiId: !Ref ContactApi
-      StageName: $default
-      AutoDeploy: true
-
-  # --- Allow API Gateway to invoke Lambda ---
-  LambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref ContactFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ContactApi}/*/*'
 
 Outputs:
   ApiUrl:
