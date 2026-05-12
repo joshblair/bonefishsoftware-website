@@ -1,20 +1,30 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   S3 origin bucket + CloudFront distribution for bonefishsoftware.com.
-  Deploy to us-west-2. Requires the ACM certificate ARN from the certificate
-  stack (deployed separately to us-east-1).
+  Deploy to us-west-2.
+  CertificateArn is optional — omit it on first deploy to get the CloudFront URL
+  immediately. Once the ACM cert is issued, redeploy with CertificateArn and
+  DomainName to switch on the custom domain.
 
 Parameters:
   DomainName:
     Type: String
-    Default: bonefishsoftware.com
+    Default: ''
+    Description: >
+      Leave blank on first deploy. Set to bonefishsoftware.com once the ACM
+      certificate is issued and your nameservers point to Route 53.
 
   CertificateArn:
     Type: String
+    Default: ''
     Description: >
-      ARN of the ACM certificate from us-east-1.
-      Run: aws cloudformation describe-stacks --stack-name bonefish-acm
-           --region us-east-1 --query "Stacks[0].Outputs[?OutputKey=='CertificateArn'].OutputValue" --output text
+      Leave blank on first deploy. Set to the ACM cert ARN (from us-east-1)
+      once the certificate has been issued.
+
+Conditions:
+  HasCustomDomain: !And
+    - !Not [!Equals [!Ref CertificateArn, '']]
+    - !Not [!Equals [!Ref DomainName, '']]
 
 Resources:
 
@@ -22,7 +32,7 @@ Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub '${DomainName}-website'
+      BucketName: bonefishsoftware-com-website
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
@@ -39,7 +49,7 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Sub '${DomainName}-oac'
+        Name: bonefishsoftware-com-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
@@ -68,15 +78,19 @@ Resources:
     Properties:
       DistributionConfig:
         Enabled: true
-        Comment: !Sub '${DomainName} static site'
+        Comment: bonefishsoftware.com static site
         DefaultRootObject: index.html
-        Aliases:
-          - !Ref DomainName
-          - !Sub 'www.${DomainName}'
-        ViewerCertificate:
-          AcmCertificateArn: !Ref CertificateArn
-          SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.2_2021
+        Aliases: !If
+          - HasCustomDomain
+          - - !Ref DomainName
+            - !Sub 'www.${DomainName}'
+          - !Ref AWS::NoValue
+        ViewerCertificate: !If
+          - HasCustomDomain
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
         HttpVersion: http2and3
         Origins:
           - Id: S3Origin
@@ -90,7 +104,7 @@ Resources:
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
           Compress: true
           AllowedMethods: [GET, HEAD, OPTIONS]
-        # SPA routing: map S3 403/404 → index.html with 200 so react-router handles it
+        # SPA routing: S3 returns 403 for missing keys with OAC — map both to index.html
         CustomErrorResponses:
           - ErrorCode: 403
             ResponseCode: 200
@@ -119,5 +133,5 @@ Outputs:
       Name: BonefishDistributionId
 
   DistributionDomain:
-    Description: CloudFront domain — point your DNS CNAME here
-    Value: !GetAtt Distribution.DomainName
+    Description: CloudFront URL — site is live here immediately
+    Value: !Sub 'https://${Distribution.DomainName}'
