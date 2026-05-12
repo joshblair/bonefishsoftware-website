@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  variables:
+    VITE_CONTACT_API_URL: ""  # overridden by CodeBuild project environment variable
+
 phases:
   install:
     runtime-versions:

@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Contact form API — API Gateway HTTP API + Python Lambda + DynamoDB + SES.
+  Deploy to us-west-2.
+
+Parameters:
+  AllowedOrigin:
+    Type: String
+    Default: https://bonefishsoftware.com
+
+  FromAddress:
+    Type: String
+    Default: noreply@bonefishsoftware.com
+
+  ToAddress:
+    Type: String
+    Default: josh.blair@gmail.com
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 15
+    MemorySize: 128
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref SubmissionsTable
+        FROM_ADDRESS: !Ref FromAddress
+        TO_ADDRESS: !Ref ToAddress
+        ALLOWED_ORIGIN: !Ref AllowedOrigin
+
+Resources:
+
+  # --- DynamoDB table ---
+  SubmissionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: bonefish-contact-submissions
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+      AttributeDefinitions:
+        - AttributeName: submissionId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: submissionId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      Tags:
+        - Key: Project
+          Value: bonefishsoftware-com
+
+  # --- Lambda execution role ---
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bonefish-contact-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ContactLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: DynamoDB
+                Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: !GetAtt SubmissionsTable.Arn
+              - Sid: SES
+                Effect: Allow
+                Action:
+                  - ses:SendEmail
+                Resource: '*'
+
+  # --- Lambda function ---
+  ContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bonefish-contact-handler
+      CodeUri: ../../lambda/contact/
+      Handler: handler.handler
+      Role: !GetAtt LambdaRole.Arn
+      Events:
+        PostContact:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ContactApi
+            Path: /contact
+            Method: POST
+        OptionsContact:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ContactApi
+            Path: /contact
+            Method: OPTIONS
+
+  # --- HTTP API ---
+  ContactApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: bonefish-contact-api
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+          - http://localhost:5173
+        AllowHeaders:
+          - Content-Type
+        AllowMethods:
+          - POST
+          - OPTIONS
+        MaxAge: 300
+
+  # --- Auto-deploy stage ---
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ContactApi
+      StageName: $default
+      AutoDeploy: true
+
+  # --- Allow API Gateway to invoke Lambda ---
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ContactFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ContactApi}/*/*'
+
+Outputs:
+  ApiUrl:
+    Description: Contact form endpoint — set as VITE_CONTACT_API_URL in CodeBuild
+    Value: !Sub 'https://${ContactApi}.execute-api.${AWS::Region}.amazonaws.com/contact'
+
+  TableName:
+    Description: DynamoDB table for contact submissions
+    Value: !Ref SubmissionsTable
