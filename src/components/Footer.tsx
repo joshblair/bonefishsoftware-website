@@ -6,10 +6,8 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Brand */}
-          <div className="flex flex-col items-center md:items-start gap-1">
-            <span className="font-semibold text-[#F0F4F8]">
-              <span className="text-[#00D4FF]">Bonefish</span> Software
-            </span>
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <img src="/logo-icon.svg" alt="Bonefish Software" className="h-10 w-auto" />
             <span className="text-xs text-[#8B95A3]">
               Custom software &amp; cloud consulting
             </span>
@@ -33,7 +31,7 @@ export default function Footer() {
           {/* Social */}
           <div className="flex gap-4">
             <a
-              href="https://linkedin.com/in/[YOUR-HANDLE]"
+              href="https://linkedin.com/in/joshblair/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
@@ -44,7 +42,7 @@ export default function Footer() {
               </svg>
             </a>
             <a
-              href="https://github.com/[YOUR-HANDLE]"
+              href="https://github.com/joshblair"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"

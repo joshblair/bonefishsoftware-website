@@ -76,10 +76,10 @@ export default function Contact() {
               <p>
                 Reach out directly at{' '}
                 <a
-                  href="mailto:[YOUR EMAIL]"
+                  href="mailto:josh.blair@gmail.com"
                   className="text-[#00D4FF] hover:underline"
                 >
-                  [YOUR EMAIL]
+                  josh.blair@gmail.com
                 </a>
               </p>
             </div>

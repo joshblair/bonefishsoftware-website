@@ -23,9 +23,8 @@ export default function Navbar() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-2 font-semibold text-[#F0F4F8]">
-            <span className="text-[#00D4FF] text-xl font-bold tracking-tight">Bonefish</span>
-            <span className="text-[#F0F4F8] text-xl font-light tracking-tight">Software</span>
+          <NavLink to="/" className="flex items-center">
+            <img src="/logo.svg" alt="Bonefish Software" className="h-10 w-auto" />
           </NavLink>
 
           {/* Desktop nav */}
