@@ -10,42 +10,42 @@ export const services: Service[] = [
     id: 'custom-software',
     title: 'Custom Software Development',
     description:
-      'Full-stack application development tailored to your business needs. From API design to polished UIs, using modern frameworks and cloud-native patterns.',
+      'We build custom business software that simplifies operations, improves workflow, and creates a better experience for your team and customers.',
     icon: '⚙️',
   },
   {
     id: 'cloud-architecture',
     title: 'Cloud Architecture & Migration',
     description:
-      'Design and implement secure, scalable AWS infrastructure. Lift-and-shift migrations, cloud-native redesigns, and cost optimization across EC2, RDS, S3, and more.',
+      'Modern cloud solutions that help businesses stay organized, secure, scalable, and cost-conscious.',
     icon: '☁️',
   },
   {
     id: 'solution-architecture',
     title: 'Solution Architecture',
     description:
-      'Translate complex business requirements into clear, maintainable technical designs. System diagrams, architecture decision records, and stakeholder-ready documentation.',
+      'We document how your systems work, what needs to be built, and why — so everyone stays on the same page.',
     icon: '🏗️',
   },
   {
     id: 'ai-ml',
     title: 'AI & Machine Learning Integration',
     description:
-      'Integrate AWS AI services into your applications — Bedrock knowledge bases, Rekognition, Comprehend, Polly, Transcribe, and Translate — to unlock intelligent capabilities fast.',
+      'Use AI to simplify workflows, improve accessibility, and unlock more value from your business data and content.',
     icon: '🤖',
   },
   {
     id: 'eda-serverless',
     title: 'Event-Driven Architecture & Serverless',
     description:
-      'Architect decoupled, resilient systems using SQS, SNS, EventBridge, and Lambda. Serverless-first designs that scale automatically and minimize operational overhead.',
+      'We create reliable, scalable systems that automate key processes and reduce manual work.',
     icon: '⚡',
   },
   {
     id: 'devops-cicd',
     title: 'DevOps & CI/CD Pipelines',
     description:
-      'Automate your software delivery with AWS CodePipeline, CodeBuild, CodeDeploy, and GitHub Actions. Repeatable, fast deployments from commit to production.',
+      'We build reliable software delivery processes that reduce errors, improve speed, and keep projects moving efficiently.',
     icon: '🔄',
   },
 ];

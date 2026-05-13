@@ -13,9 +13,10 @@ export const team: TeamMember[] = [
     name: 'Josh Blair',
     title: 'Founder & Principal Engineer — AWS Cloud Architect | Agentic AI Specialist',
     bio: [
-      'Josh is a passionate, results-driven software developer and cloud architect with a decade of experience delivering production-grade solutions for enterprise clients. Most recently, he served as Lead Software Developer at Kanso Software for over 9 years, driving innovation in cloud-based housing authority platforms serving hundreds of organizations across the United States.',
-      'Today, Josh\'s primary focus is building intelligent Agentic AI systems — designing scalable architectures powered by AWS Bedrock, Knowledge Bases, Guardrails, and event-driven patterns that solve real-world problems at scale. He combines deep backend expertise in C# .NET, Node.js, and SQL with modern serverless and AI-native design, and is actively building proficiency in Python for AI agent development.',
-      'Josh brings the same energy to every engagement: ship high-quality software, communicate clearly, and leave the codebase better than he found it.',
+      'Josh is a software developer and cloud architect with more than 30 years of experience building dependable technology solutions and helping teams solve complex problems. Over the last decade, his work has focused heavily on cloud-based software platforms, including more than 9 years at Kanso Software as a Senior and Lead Software Developer supporting housing authority systems used by hundreds of organizations across the United States.',
+      'Today, Josh focuses on modern cloud architecture and intelligent AI-powered systems using AWS technologies like Bedrock, Knowledge Bases, Guardrails, Lambda, and event-driven infrastructure. His background includes deep experience in C# .NET, Node.js, SQL, serverless systems, and cloud-native application design, along with continued growth in Python and AI agent development.',
+      'What people tend to appreciate most about Josh is not just his technical knowledge, but the way he works with others. He\'s known for being approachable, thoughtful, collaborative, and easy to talk to. He enjoys mentoring, helping teams work through difficult challenges, and explaining technical concepts in a way that makes sense to both technical and non-technical people.',
+      'Josh brings a steady, team-oriented approach to every project. He cares about building reliable systems, communicating clearly, supporting the people around him, and creating solutions that genuinely help clients and organizations operate more effectively.',
     ],
     certifications: [
       'AWS Certified Solutions Architect – Associate',

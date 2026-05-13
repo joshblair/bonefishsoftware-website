@@ -21,7 +21,7 @@ export default function Services() {
               <h3 className="text-lg font-semibold text-[#F0F4F8] mb-3 group-hover:text-[#00D4FF] transition-colors">
                 {svc.title}
               </h3>
-              <p className="text-[#B8C5D0] text-sm leading-relaxed flex-1">{svc.description}</p>
+              <p className="text-[#CBD5E1] text-sm leading-relaxed flex-1">{svc.description}</p>
             </div>
           ))}
         </div>
@@ -30,7 +30,7 @@ export default function Services() {
           <h3 className="text-xl font-semibold text-[#00D4FF] mb-3">
             Need something not listed here?
           </h3>
-          <p className="text-[#B8C5D0] mb-6 max-w-lg mx-auto">
+          <p className="text-[#CBD5E1] mb-6 max-w-lg mx-auto">
             Every project is different. Reach out and let's figure out together how we can help.
           </p>
           <Link

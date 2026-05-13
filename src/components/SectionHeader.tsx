@@ -11,7 +11,7 @@ export default function SectionHeader({ title, subtitle, centered = true }: Prop
         {title}
       </h2>
       {subtitle && (
-        <p className={`mt-4 text-[#B8C5D0] text-lg max-w-2xl ${centered ? 'mx-auto' : ''}`}>
+        <p className={`mt-4 text-[#CBD5E1] text-lg max-w-2xl ${centered ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}

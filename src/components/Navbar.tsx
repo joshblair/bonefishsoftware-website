@@ -15,7 +15,7 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm font-medium transition-colors ${
-      isActive ? 'text-[#00D4FF]' : 'text-[#B8C5D0] hover:text-[#F0F4F8]'
+      isActive ? 'text-[#00D4FF]' : 'text-[#CBD5E1] hover:text-[#F0F4F8]'
     }`;
 
   return (
@@ -48,7 +48,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-[#B8C5D0] hover:text-[#F0F4F8] p-2"
+            className="md:hidden text-[#CBD5E1] hover:text-[#F0F4F8] p-2"
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >
