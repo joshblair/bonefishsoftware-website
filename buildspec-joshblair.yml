@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  variables:
+    VITE_CONTACT_API_URL: ""  # overridden by CodeBuild project environment variable
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - cd sites/joshblair
+      - npm ci
+
+  build:
+    commands:
+      - npm run build
+
+  post_build:
+    commands:
+      - aws s3 sync dist/ s3://$S3_BUCKET --delete
+      - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"

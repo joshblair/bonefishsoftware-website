@@ -3,6 +3,7 @@ export interface TeamMember {
   title: string;
   bio: string[];
   certifications: string[];
+  website?: string;
   linkedin?: string;
   github?: string;
   photo?: string;
@@ -26,6 +27,7 @@ export const team: TeamMember[] = [
       'Microsoft Certified Application Developer .NET',
       'Microsoft Certified Professional',
     ],
+    website: 'https://joshblair.bonefishsoftware.com',
     linkedin: 'https://linkedin.com/in/joshblair/',
     github: 'https://github.com/joshblair',
     photo: '/josh-blair.jpg',

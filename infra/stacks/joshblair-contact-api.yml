@@ -1,21 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Contact form API — HTTP API + Python Lambda + DynamoDB + SES.
+  Contact form API for joshblair.bonefishsoftware.com.
+  HTTP API + Python Lambda + DynamoDB + SES.
   Deploy to us-west-2.
 
 Parameters:
-  AllowedOrigin:
-    Type: String
-    Default: https://bonefishsoftware.com
-
   FromAddress:
     Type: String
     Default: noreply@bonefishsoftware.com
+    Description: SES-verified sender address.
 
   ToAddress:
     Type: String
     Default: josh.blair@gmail.com
+    Description: Recipient address for contact form submissions.
 
 Globals:
   Function:
@@ -27,15 +26,13 @@ Globals:
         TABLE_NAME: !Ref SubmissionsTable
         FROM_ADDRESS: !Ref FromAddress
         TO_ADDRESS: !Ref ToAddress
-        ALLOWED_ORIGIN: !Ref AllowedOrigin
 
 Resources:
 
-  # --- DynamoDB table ---
   SubmissionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: bonefish-contact-submissions
+      TableName: joshblair-contact-submissions
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: submissionId
@@ -49,19 +46,17 @@ Resources:
           KeyType: RANGE
       Tags:
         - Key: Project
-          Value: bonefishsoftware-com
+          Value: joshblair-bonefishsoftware-com
 
-  # --- HTTP API (SAM manages routes, integrations, and stage automatically) ---
   ContactApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: $default
       CorsConfiguration:
         AllowOrigins:
-          - !Ref AllowedOrigin
           - https://joshblair.bonefishsoftware.com
-          - http://localhost:5173
           - http://localhost:5174
+          - http://localhost:5175
         AllowHeaders:
           - Content-Type
         AllowMethods:
@@ -69,11 +64,10 @@ Resources:
           - OPTIONS
         MaxAge: 300
 
-  # --- Lambda execution role ---
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: bonefish-contact-lambda-role
+      RoleName: joshblair-contact-lambda-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -84,7 +78,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: ContactLambdaPolicy
+        - PolicyName: JoshBlairContactLambdaPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -99,12 +93,11 @@ Resources:
                   - ses:SendEmail
                 Resource: '*'
 
-  # --- Lambda function ---
   ContactFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: bonefish-contact-handler
-      CodeUri: ../../lambda/contact/
+      FunctionName: joshblair-contact-handler
+      CodeUri: ../../lambda/joshblair-contact/
       Handler: handler.handler
       Role: !GetAtt LambdaRole.Arn
       Events:
@@ -123,9 +116,9 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: Contact form endpoint — set as VITE_CONTACT_API_URL in CodeBuild
+    Description: Contact form endpoint — set as VITE_CONTACT_API_URL in the joshblair CodeBuild project
     Value: !Sub 'https://${ContactApi}.execute-api.${AWS::Region}.amazonaws.com/contact'
 
   TableName:
-    Description: DynamoDB table for contact submissions
+    Description: DynamoDB table for joshblair contact submissions
     Value: !Ref SubmissionsTable

@@ -1,61 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Josh Blair — Software Engineer & AWS Architect</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #111318;
-      color: #F0F4F8;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      text-align: center;
-      padding: 3rem 2rem;
-      max-width: 480px;
-    }
-    h1 { font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem; }
-    .title { color: #00D4FF; font-size: 1rem; margin-bottom: 1.5rem; }
-    p { color: #B8C5D0; line-height: 1.6; margin-bottom: 2rem; }
-    .links { display: flex; gap: 1.5rem; justify-content: center; }
-    a {
-      color: #B8C5D0;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-    a:hover { color: #00D4FF; }
-    .dot {
-      display: inline-block;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #00D4FF;
-      animation: pulse 2s infinite;
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Josh Blair</h1>
-    <p class="title">Software Engineer &amp; AWS Cloud Architect</p>
-    <p><span class="dot"></span>Site coming soon — building something great.</p>
-    <div class="links">
-      <a href="https://bonefishsoftware.com">Bonefish Software &amp; Consulting</a>
-      <a href="https://linkedin.com/in/joshblair/" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/joshblair" target="_blank" rel="noopener">GitHub</a>
-    </div>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Josh Blair — Software Engineer & AWS Cloud Architect</title>
+    <meta name="description" content="Josh Blair is a software engineer and AWS cloud architect with 30+ years of experience building dependable technology solutions." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
