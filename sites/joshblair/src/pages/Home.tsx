@@ -22,6 +22,11 @@ export default function Home() {
     <div>
       <section className="bg-gradient-to-b from-[#1C2028] to-[#111318] min-h-[calc(100vh-4rem)] flex items-center">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <img
+            src="/josh-blair.jpg"
+            alt="Josh Blair"
+            className="w-28 h-28 rounded-full object-cover object-top border-2 border-[#00D4FF]/30 mx-auto mb-8"
+          />
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#F0F4F8] mb-4 tracking-tight">
             Josh Blair
           </h1>
