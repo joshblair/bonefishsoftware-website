@@ -23,6 +23,7 @@ export const team: TeamMember[] = [
       'AWS Certified Solutions Architect – Associate',
       'AWS Certified Cloud Practitioner',
       'AWS Partner Accreditation – Technical',
+      'Introduction to FDC3 – LFEL1000 (Linux Foundation)',
       'Certified ScrumMaster',
       'Microsoft Certified Application Developer .NET',
       'Microsoft Certified Professional',

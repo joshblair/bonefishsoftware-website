@@ -1,55 +1,70 @@
 const techStack = [
   {
-    category: 'Cloud',
-    items: ['AWS Bedrock', 'Lambda', 'S3', 'CloudFront', 'DynamoDB', 'SES', 'CDK', 'SAM'],
+    category: 'AWS Cloud',
+    items: ['Lambda', 'Fargate', 'ECS / ECR', 'S3', 'CloudFront', 'API Gateway', 'SQS', 'SNS', 'EventBridge', 'DynamoDB', 'RDS', 'Bedrock', 'Bedrock Knowledge Bases', 'Bedrock Guardrails', 'CloudFormation', 'CDK', 'SAM', 'CloudWatch', 'IAM', 'Route 53'],
   },
   {
-    category: 'Backend',
-    items: ['Python', 'Node.js', 'TypeScript', 'C# .NET', 'SQL'],
+    category: 'Back-End',
+    items: ['.NET Core', 'C# .NET', 'Entity Framework', 'Node.js', 'Python', 'Django', 'Boto3', 'RESTful APIs', 'GraphQL'],
   },
   {
-    category: 'Frontend',
-    items: ['React', 'Tailwind CSS', 'Vite'],
+    category: 'Front-End',
+    items: ['Angular (up to 17)', 'AngularJS', 'TypeScript', 'JavaScript', 'React', 'HTML / CSS', 'MEAN Stack'],
   },
   {
-    category: 'AI / ML',
-    items: ['Claude', 'Bedrock Agents', 'RAG', 'LangChain', 'OpenSearch'],
+    category: 'Databases',
+    items: ['MS SQL Server', 'MongoDB', 'PostgreSQL', 'MySQL / MariaDB', 'DynamoDB'],
+  },
+  {
+    category: 'DevOps & CI/CD',
+    items: ['GitLab CI/CD', 'Bitbucket CI/CD', 'AWS CodePipeline', 'Docker', 'GitHub Actions', 'EKS'],
+  },
+  {
+    category: 'AI / Agentic',
+    items: ['Claude', 'AWS Bedrock Agents', 'RAG', 'Bedrock Knowledge Bases', 'Rekognition', 'Comprehend', 'Prompt Engineering'],
   },
 ]
 
 const certifications = [
-  'AWS Solutions Architect – Associate',
-  'AWS Cloud Practitioner',
-  'AWS Partner Accreditation – Technical',
-  'Certified ScrumMaster (CSM)',
-  'MCAD .NET',
-  'MCP (Microsoft Certified Professional)',
+  'AWS Certified Solutions Architect – Associate (2023)',
+  'AWS Certified Cloud Practitioner (2021)',
+  'AWS Partner: Accreditation (Technical) (2024)',
+  'Introduction to FDC3 — LFEL1000, Linux Foundation (2025)',
+  'Certified ScrumMaster (2015)',
+  'Microsoft Certified Application Developer: .NET (2007)',
+  'Microsoft Certified Professional (2005)',
 ]
 
 const timeline = [
   {
-    year: '2024 – Present',
-    role: 'Founder & Principal Engineer',
-    company: 'Bonefish Software & Consulting',
-    description: 'Providing cloud architecture and software engineering consulting. Focused on AWS-native solutions, agentic AI systems, and serverless architectures.',
+    year: '2017 – Present',
+    role: 'Owner / Senior Software Engineer / Solutions Architect',
+    company: 'Bonefish Software & Consulting, LLC',
+    description: 'Providing custom software development and AWS cloud architecture consulting. Focused on serverless, event-driven, and agentic AI-powered systems built on AWS Bedrock and Claude.',
   },
   {
-    year: '2015 – 2024',
-    role: 'Lead Software Developer',
+    year: '2017 – 2026',
+    role: 'Lead Software Engineer',
     company: 'Kanso Software',
-    description: 'Led development of mission-critical housing authority management systems. Designed and built full-stack applications serving public housing agencies across the country.',
+    description: 'Led development of a SaaS housing platform serving 220+ housing authorities, processing $38M+ in annual transactions across 100K+ units with 99.99% uptime — reducing operational costs by 35%. Architected full MEAN stack and AWS serverless infrastructure; led a team of 6+ engineers.',
   },
   {
-    year: '2010 – 2015',
-    role: 'Senior Software Developer',
-    company: 'Various',
-    description: 'Built enterprise applications in C# .NET, SQL Server, and early cloud technologies. Focused on data architecture, API design, and systems integration.',
+    year: '2012 – 2017',
+    role: 'Senior Software Engineer, Project Lead',
+    company: 'The Regis Company',
+    description: 'Built complex SaaS business simulations for Fortune 500 clients including EY, Deloitte, Accenture, Abbott, and Northwestern Mutual. Led teams through high-pressure real-time simulation scenarios involving 40–50 competing teams.',
   },
   {
-    year: 'Early Career',
-    role: 'Software Developer',
-    company: 'Various',
-    description: 'Over a decade building the foundational skills in software engineering, database design, and systems development that underpin a 30+ year career.',
+    year: '2010 – 2012',
+    role: 'Development Lead / Senior .NET Developer',
+    company: 'GoDaddy',
+    description: 'Built a Content Delivery System that cut deployment times from 8+ hours to 10 minutes. Developed landing pages and e-commerce systems for one of the world\'s largest domain registrars.',
+  },
+  {
+    year: '1996 – 2010',
+    role: 'Senior Software Engineer',
+    company: 'Softbrands (Infor) · HydraForce',
+    description: 'Built the foundation: MRP/ERP systems, manufacturing automation, e-commerce platforms, and enterprise integrations across two decades of professional software development.',
   },
 ]
 
@@ -70,16 +85,16 @@ export default function About() {
             <p className="text-xl text-[#00D4FF] font-semibold mb-6">Software Engineer & AWS Cloud Architect</p>
             <div className="flex flex-col gap-4 text-[#CBD5E1] leading-relaxed max-w-2xl">
               <p>
-                I'm a software engineer and AWS cloud architect with over 30 years of experience designing and building systems that people depend on. I started writing code when the web was young and I've never stopped learning since.
+                I'm an AWS Certified Solutions Architect and cloud developer with 30+ years of experience in software engineering, cloud architecture, and enterprise application modernization. Over the past decade I've specialized in designing and implementing scalable, cost-efficient, and secure cloud solutions using AWS.
               </p>
               <p>
-                For most of the past decade, I led software development at Kanso Software, where I helped build and maintain complex housing authority management systems used by public housing agencies nationwide. That work taught me a great deal about long-lived systems, reliability under pressure, and the importance of clear communication with stakeholders.
+                My most recent role was Lead Software Engineer at Kanso Software, where I helped architect and scale a SaaS platform serving 220+ housing authorities — processing $38M+ in annual transactions across 100K+ units, with 99.99% uptime and a 35% reduction in operational costs. I led a team of 6+ engineers, championed DevOps practices that cut deployment times by 60%, and delivered 50+ customer-facing features.
               </p>
               <p>
-                Today, through Bonefish Software & Consulting, I focus on helping teams and organizations move confidently to the cloud. I specialize in AWS-native architectures — serverless, event-driven, and increasingly AI-powered — with a particular interest in agentic systems built on Claude and AWS Bedrock.
+                Today, through Bonefish Software & Consulting, I focus on AWS-native architectures — serverless, event-driven, and AI-powered — with a growing specialty in agentic systems built on Claude and AWS Bedrock. I'm also completing the AWS Cloud Institute Certified Cloud Developer program, which has deepened my hands-on experience with containers, Bedrock AI/ML services, and advanced IaC patterns.
               </p>
               <p>
-                I care about building things that work. Not just on launch day, but for the long haul. I write clean code, design resilient systems, and take mentorship seriously.
+                I care about building systems that are reliable, maintainable, and actually help the people who use them. I'm known for being approachable, collaborative, and able to explain technical concepts clearly to both engineers and business stakeholders.
               </p>
             </div>
           </div>

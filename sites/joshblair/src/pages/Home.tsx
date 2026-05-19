@@ -3,7 +3,7 @@ import { projects } from '../data/projects'
 import { testimonials } from '../data/testimonials'
 import { articles } from '../data/articles'
 
-const techTags = ['AWS', 'Python', 'TypeScript', 'React', 'AI/ML', 'Node.js']
+const techTags = ['AWS', 'Serverless', '.NET / C#', 'Node.js', 'Python', 'TypeScript', 'Angular', 'Agentic AI']
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -26,10 +26,10 @@ export default function Home() {
             Josh Blair
           </h1>
           <p className="text-xl sm:text-2xl font-semibold text-[#00D4FF] mb-6">
-            Software Engineer & AWS Cloud Architect
+            AWS Cloud Architect · Full-Stack Engineer · Agentic AI
           </p>
           <p className="text-lg text-[#CBD5E1] max-w-2xl mx-auto mb-10">
-            30+ years building reliable systems. Today focused on cloud architecture and AI-powered solutions.
+            30+ years building dependable systems. Focused on serverless AWS architecture, event-driven design, and AI-powered solutions using Claude and Bedrock.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link
