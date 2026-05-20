@@ -9,33 +9,9 @@
 
 Every push to the `main` branch on GitHub automatically builds the React app and deploys it to S3 + CloudFront — zero manual steps. This article covers how that pipeline is wired together using AWS CodePipeline, CodeBuild, and GitHub via CodeStar Connections.
 
-See [`docs/diagrams/cicd-pipeline.excalidraw`](diagrams/cicd-pipeline.excalidraw) for the visual diagram.
-
----
-
 ## Pipeline Flow
 
-```
-Developer: git push origin main
-          │
-          ▼
-     GitHub (private repo)
-     joshblair/bonefishsoftware-website
-          │
-          │  CodeStar Connection (GitHub App)
-          ▼
-     CodePipeline — bonefish-website-pipeline
-     │
-     ├── Stage 1: Source
-     │   └── Downloads source artifact → S3 artifact bucket
-     │
-     └── Stage 2: Build
-         └── CodeBuild — bonefish-build
-             ├── npm ci
-             ├── npm run build  (tsc + vite)
-             ├── aws s3 sync dist/ s3://bonefishsoftware-com-website --delete
-             └── aws cloudfront create-invalidation --paths "/*"
-```
+![CI/CD pipeline](diagrams/ci-cd-pipeline.png)
 
 ---
 

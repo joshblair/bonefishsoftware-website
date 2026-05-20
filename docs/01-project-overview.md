@@ -27,40 +27,7 @@ This series documents the end-to-end process of designing, building, and deployi
 
 ## Architecture Overview
 
-```
-                          ┌─────────────────────────────────────────────────┐
-                          │                  us-east-1                      │
-                          │  ┌──────────────┐    ┌────────────────────────┐ │
-                          │  │   Route 53   │    │   ACM Certificate      │ │
-                          │  │  (DNS)       │    │   (TLS for CloudFront) │ │
-                          │  └──────┬───────┘    └────────────────────────┘ │
-                          └─────────┼───────────────────────────────────────┘
-                                    │
-                          ┌─────────▼───────────────────────────────────────┐
-                          │               us-west-2                         │
-    Internet Users ──────►│  ┌──────────────────────────────────────────┐   │
-                          │  │          CloudFront Distribution          │   │
-                          │  │  (CDN, HTTPS, custom domain, SPA routing) │   │
-                          │  └───────────────────┬──────────────────────┘   │
-                          │                      │ OAC                       │
-                          │          ┌───────────▼──────────┐               │
-                          │          │   S3 Bucket (private) │               │
-                          │          │   Static site assets  │               │
-                          │          └──────────────────────┘               │
-                          │                                                  │
-                          │  ┌──────────────┐   ┌──────────┐  ┌─────────┐  │
-                          │  │ API Gateway  │──►│  Lambda  │─►│DynamoDB │  │
-                          │  │  (HTTP API)  │   │ (Python) │  │         │  │
-                          │  └──────────────┘   └────┬─────┘  └─────────┘  │
-                          │                          │                       │
-                          │                     ┌────▼─────┐                │
-                          │                     │   SES    │                │
-                          │                     │  (Email) │                │
-                          │                     └──────────┘                │
-                          └─────────────────────────────────────────────────┘
-```
-
-See [`docs/diagrams/architecture-overview.excalidraw`](diagrams/architecture-overview.excalidraw) for the full visual diagram.
+![Architecture overview](diagrams/bonefish-software-site-architecture.png)
 
 ---
 
@@ -68,27 +35,7 @@ See [`docs/diagrams/architecture-overview.excalidraw`](diagrams/architecture-ove
 
 Every push to the `main` branch on GitHub automatically triggers a full build and deploy:
 
-```
-Developer pushes to main
-        │
-        ▼
-   GitHub (source)
-        │
-        ▼  CodeStar Connection
-   CodePipeline
-        │
-        ▼  Source Stage
-   Downloads source artifact
-        │
-        ▼  Build Stage
-   CodeBuild
-   ├── npm ci
-   ├── npm run build  (Vite bundles React app)
-   ├── aws s3 sync dist/ → S3
-   └── CloudFront invalidation (/* )
-```
-
-See [`docs/diagrams/cicd-pipeline.excalidraw`](diagrams/cicd-pipeline.excalidraw) for the visual diagram.
+![CI/CD pipeline](diagrams/ci-cd-pipeline.png)
 
 ---
 

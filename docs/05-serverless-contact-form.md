@@ -9,39 +9,9 @@
 
 The contact form on bonefishsoftware.com is fully serverless — no EC2, no always-on server. A visitor submits the form, the request hits an API Gateway HTTP API, a Python Lambda function validates and stores the submission in DynamoDB, then sends an email notification via SES. Cost at low volume: effectively zero.
 
-See [`docs/diagrams/contact-form-flow.excalidraw`](diagrams/contact-form-flow.excalidraw) for the visual diagram.
-
----
-
 ## Flow
 
-```
-Browser (Contact Form)
-        │
-        │  POST /contact
-        │  { name, email, company, message }
-        ▼
-API Gateway HTTP API
-(CORS: bonefishsoftware.com + localhost:5173)
-        │
-        ▼
-Lambda Function (Python 3.12)
-├── Validate input
-├── Generate submission ID (UUID)
-│
-├── DynamoDB PutItem
-│   Table: bonefish-contact-submissions
-│   Key: submissionId (UUID) + timestamp (ISO 8601)
-│
-└── SES SendEmail
-    FROM: noreply@bonefishsoftware.com
-    TO:   josh.blair@gmail.com
-    Reply-To: <submitter's email>
-    Body: name, email, company, message, submission ID
-        │
-        ▼
-    { "message": "Message received! We'll be in touch soon." }
-```
+![Contact form flow](diagrams/contact-form-architecture.png)
 
 ---
 
