@@ -9,31 +9,9 @@
 
 This article covers deploying a static React site to AWS using S3 as the origin, CloudFront as the CDN, ACM for TLS certificates, and Route 53 for DNS. Everything is defined as CloudFormation infrastructure-as-code.
 
-See [`docs/diagrams/aws-static-hosting.excalidraw`](diagrams/aws-static-hosting.excalidraw) for the architecture diagram.
-
----
-
 ## Architecture
 
-```
-Internet Users
-     │
-     ▼
-Route 53 (DNS)
-bonefishsoftware.com → A alias → CloudFront
-     │
-     ▼
-CloudFront Distribution
-├── Custom domain: bonefishsoftware.com, www.bonefishsoftware.com
-├── TLS cert: ACM (us-east-1)
-├── HTTP → HTTPS redirect
-├── SPA error routing: 403/404 → index.html
-└── Cache policy: CachingOptimized
-     │
-     ▼ (Origin Access Control — SigV4 signed requests)
-S3 Bucket (private)
-└── Static site assets (index.html, JS, CSS, images)
-```
+![Static hosting architecture](diagrams/bonefish-software-site-architecture.png)
 
 ---
 
