@@ -18,7 +18,6 @@ export default function Footer() {
             {[
               ['/services', 'Services'],
               ['/technologies', 'Technologies'],
-              ['/portfolio', 'Portfolio'],
               ['/team', 'Team'],
               ['/contact', 'Contact'],
             ].map(([to, label]) => (
