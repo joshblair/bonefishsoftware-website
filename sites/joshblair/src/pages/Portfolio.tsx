@@ -83,6 +83,16 @@ export default function Portfolio() {
                 >
                   GitHub
                 </a>
+                {project.articleSeriesUrl && (
+                  <a
+                    href={project.articleSeriesUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border border-[#2A3040] text-[#CBD5E1] px-4 py-2 rounded-lg text-sm hover:border-[#00D4FF] hover:text-[#00D4FF] transition-colors"
+                  >
+                    Article Series
+                  </a>
+                )}
                 {project.liveUrl && (
                   <a
                     href={project.liveUrl}

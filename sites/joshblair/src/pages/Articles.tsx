@@ -29,7 +29,14 @@ export default function Articles() {
                 className="rounded-xl border border-[#2A3040] bg-[#1C2028] p-8 flex flex-col gap-4"
               >
                 <div>
-                  <p className="text-xs text-[#B8C5D0] mb-2">{formatDate(article.date)}</p>
+                  <div className="flex items-center gap-3 mb-2">
+                    <p className="text-xs text-[#B8C5D0]">{formatDate(article.date)}</p>
+                    {article.isSeries && (
+                      <span className="rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2 py-0.5 text-xs text-[#00D4FF]">
+                        Series · {article.articleCount} articles
+                      </span>
+                    )}
+                  </div>
                   <h2 className="text-2xl font-semibold text-[#F0F4F8] mb-3">{article.title}</h2>
                   <p className="text-[#CBD5E1] leading-relaxed">{article.summary}</p>
                 </div>
@@ -47,7 +54,7 @@ export default function Articles() {
 
                 {hasExternalLinks ? (
                   <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-[#2A3040]">
-                    <span className="text-xs text-[#B8C5D0]">Read on:</span>
+                    <span className="text-xs text-[#B8C5D0]">{article.isSeries ? 'Read the series:' : 'Read on:'}</span>
                     {article.devToUrl && (
                       <a
                         href={article.devToUrl}
