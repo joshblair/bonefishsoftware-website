@@ -1,0 +1,256 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Catch-all inbound mail for bonefishsoftware.com, forwarded to a personal inbox.
+  SES receipt rule + S3 (30-day retention) + Python Lambda + Route 53 MX/SPF/DMARC.
+  Deploy to us-west-2 (an SES inbound region). After the first deploy, activate
+  the rule set once:
+    aws ses set-active-receipt-rule-set --rule-set-name bonefish-inbound --region us-west-2
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: bonefishsoftware.com
+
+  HostedZoneId:
+    Type: String
+    Default: Z06079633EFM8F3IOXLZS
+
+  ForwardFrom:
+    Type: String
+    Default: forwarder@bonefishsoftware.com
+    Description: Sender for forwarded mail. Must be on the SES-verified domain.
+
+  ForwardTo:
+    Type: String
+    Default: josh.blair@gmail.com
+    Description: Inbox that receives all forwarded mail.
+
+  RetentionDays:
+    Type: Number
+    Default: 30
+    Description: Days to keep the raw copy of each message in S3.
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+
+  # --- Raw message store (backup copy of every inbound message) ---
+  MailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'bonefish-inbound-mail-${AWS::AccountId}'
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireInboundMail
+            Status: Enabled
+            Prefix: inbound/
+            ExpirationInDays: !Ref RetentionDays
+      Tags:
+        - Key: Project
+          Value: bonefishsoftware-com
+
+  MailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MailBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSESPuts
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub '${MailBucket.Arn}/inbound/*'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/bonefish-inbound:receipt-rule/*'
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt MailBucket.Arn
+              - !Sub '${MailBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+  # --- Failure alerts (a forward that fails all retries) ---
+  ForwarderFailureTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: bonefish-mail-forwarder-failures
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref ForwardTo
+
+  # --- Lambda execution role ---
+  ForwarderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bonefish-mail-forwarder-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: MailForwarderPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadRawMail
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub '${MailBucket.Arn}/inbound/*'
+              - Sid: SendForward
+                Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    ses:FromAddress: !Ref ForwardFrom
+              - Sid: PublishFailures
+                Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref ForwarderFailureTopic
+
+  ForwarderLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/bonefish-mail-forwarder
+      RetentionInDays: 30
+
+  # --- Lambda function ---
+  ForwarderFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: ForwarderLogGroup
+    Properties:
+      FunctionName: bonefish-mail-forwarder
+      CodeUri: ../../lambda/mail-forwarder/
+      Handler: handler.handler
+      Role: !GetAtt ForwarderRole.Arn
+      Environment:
+        Variables:
+          MAIL_BUCKET: !Ref MailBucket
+          MAIL_PREFIX: inbound/
+          FORWARD_FROM: !Ref ForwardFrom
+          FORWARD_TO: !Ref ForwardTo
+          DOMAIN_LABEL: !Ref DomainName
+      EventInvokeConfig:
+        MaximumRetryAttempts: 2
+        DestinationConfig:
+          OnFailure:
+            Type: SNS
+            Destination: !Ref ForwarderFailureTopic
+
+  ForwarderInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ForwarderFunction
+      Action: lambda:InvokeFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/bonefish-inbound:receipt-rule/*'
+
+  # --- SES receipt rules ---
+  # A rule set must be made active once by CLI (see Description); CloudFormation can't do it.
+  ReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: bonefish-inbound
+
+  ForwardRule:
+    Type: AWS::SES::ReceiptRule
+    # SES checks it can write to the bucket and invoke the function when the rule is created.
+    DependsOn:
+      - MailBucketPolicy
+      - ForwarderInvokePermission
+    Properties:
+      RuleSetName: !Ref ReceiptRuleSet
+      Rule:
+        Name: forward-all
+        Enabled: true
+        ScanEnabled: true
+        TlsPolicy: Optional
+        # A bare domain matches every address at that domain (the catch-all).
+        Recipients:
+          - !Ref DomainName
+        Actions:
+          - S3Action:
+              BucketName: !Ref MailBucket
+              ObjectKeyPrefix: inbound/
+          - LambdaAction:
+              FunctionArn: !GetAtt ForwarderFunction.Arn
+              InvocationType: Event
+
+  # --- DNS ---
+  MxRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: MX
+      TTL: '300'
+      ResourceRecords:
+        - !Sub '10 inbound-smtp.${AWS::Region}.amazonaws.com'
+
+  # Only SES sends as this domain. Any other sender added later must be listed here too.
+  SpfRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: TXT
+      TTL: '300'
+      ResourceRecords:
+        - '"v=spf1 include:amazonses.com -all"'
+
+  DmarcRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub '_dmarc.${DomainName}'
+      Type: TXT
+      TTL: '300'
+      ResourceRecords:
+        - '"v=DMARC1; p=quarantine; adkim=r; aspf=r"'
+
+Outputs:
+  MailBucketName:
+    Description: Raw copies of inbound mail (expire after RetentionDays)
+    Value: !Ref MailBucket
+
+  ReceiptRuleSetName:
+    Description: Activate once with aws ses set-active-receipt-rule-set
+    Value: !Ref ReceiptRuleSet
+
+  FailureTopicArn:
+    Description: Confirm the SNS email subscription to get failure alerts
+    Value: !Ref ForwarderFailureTopic
