@@ -210,6 +210,24 @@ Resources:
               FunctionArn: !GetAtt ForwarderFunction.Arn
               InvocationType: Event
 
+  # --- SMTP user for Gmail "Send mail as" ---
+  # The access key is created by CLI (not here) so the secret never lands in CloudFormation.
+  GmailSmtpUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: bonefish-gmail-smtp
+      Policies:
+        - PolicyName: SendAsDomainOnly
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ses:SendRawEmail
+                Resource: '*'
+                Condition:
+                  StringLike:
+                    ses:FromAddress: !Sub '*@${DomainName}'
+
   # --- DNS ---
   MxRecord:
     Type: AWS::Route53::RecordSet
